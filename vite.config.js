@@ -21,7 +21,15 @@ import { fileURLToPath } from 'url';
 // top-level await.
 const buildTarget = 'es2022';
 
-// Requests to forward to nginx
+// =============================================================================
+// THEO COLLECT - API Proxy Configuration
+// Proxy requests to ODK Central backend at www.job-tracker.fr
+// =============================================================================
+
+// Target ODK Central server
+const ODK_CENTRAL_SERVER = 'https://job-tracker.fr';
+
+// Requests to forward to ODK Central backend
 const proxyPaths = [
   '/v1',
   '/-',
@@ -29,13 +37,27 @@ const proxyPaths = [
   '/client-config.json',
   '/version.txt'
 ];
+
+// Create proxy configuration for each path
+const createProxyConfig = (target) => ({
+  target,
+  changeOrigin: true,
+  secure: true,
+  // Preserve cookies for authentication
+  cookieDomainRewrite: '',
+  // Forward the host header
+  headers: {
+    'X-Forwarded-Host': new URL(target).host
+  }
+});
+
 const devServer = {
   port: 8989,
-  proxy: Object.fromEntries(proxyPaths.map(path => [path, 'http://localhost:8686'])),
-  // Because we proxy to nginx, which itself proxies to Backend and other
-  // things, the dev server doesn't need to allow CORS. CORS is already limited
-  // by default, but we just don't need it at all.
-  cors: false
+  proxy: Object.fromEntries(
+    proxyPaths.map(path => [path, createProxyConfig(ODK_CENTRAL_SERVER)])
+  ),
+  // Allow CORS since we're proxying to external server
+  cors: true
 };
 
 export default defineConfig(({ mode }) => ({

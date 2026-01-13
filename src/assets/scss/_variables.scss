@@ -10,10 +10,26 @@ including this file, may be copied, modified, propagated, or distributed
 except according to the terms contained in the LICENSE file.
 */
 
-// Core
-$color-accent-primary: #bd006b;
-$color-accent-secondary: #8d0050;
-$color-page-background: #f7f7f7;
+// =============================================================================
+// THEO COLLECT - Design System Colors
+// Based on THEO Design System v1.0.4
+// =============================================================================
+
+// THEO Palette
+$color-geo-bg: #F2F0E9;
+$color-geo-card: #F9F8F4;
+$color-geo-dark: #1A1A1A;
+$color-geo-gray: #7A7A7A;
+$color-geo-orange: #C88045;
+$color-geo-green: #2D4F42;
+$color-geo-green-dark: #1E362D;
+$color-geo-olive: #6B705C;
+$color-geo-border: #E5E2D9;
+
+// Core - Mapped from THEO
+$color-accent-primary: $color-geo-green;
+$color-accent-secondary: $color-geo-green-dark;
+$color-page-background: $color-geo-bg;
 
 // Media query breakpoints - copied from bootstrap
 $screen-xs-min: 480px;
@@ -25,39 +41,39 @@ $z-index-toast: 1061; // 1 greater than the Bootstrap maximum
 $z-index-modal: 1050;
 $z-index-modal-backdrop: 1040;
 
-// Text
-$color-text: #333;
-$font-family-monospace: Monaco, Menlo, Consolas, "Courier New", monospace;
-$color-text-secondary: #9499A5;
+// Text - THEO colors
+$color-text: $color-geo-dark;
+$font-family-monospace: ui-monospace, SFMono-Regular, Monaco, Menlo, Consolas, "Courier New", monospace;
+$color-text-secondary: $color-geo-gray;
 
 // Icons
 $margin-right-icon: 6px;
 
-// Contextual colors
-$color-success: #08a10b;
-$color-success-light: #ddf1d5;
-$color-success-dark: darken($color-success, 10%);
-$color-info: #31708f;
-$color-info-light: #d9edf7;
+// Contextual colors - THEO harmonized
+$color-success: $color-geo-green;
+$color-success-light: #E8EFEC;
+$color-success-dark: $color-geo-green-dark;
+$color-info: $color-geo-olive;
+$color-info-light: #ECEEE9;
 $color-info-dark: darken($color-info, 10%);
-$color-warning: #f29e00;
-$color-warning-light: #f5c93b;
-$color-warning-dark: #e06f0b;
+$color-warning: $color-geo-orange;
+$color-warning-light: #F5E6D8;
+$color-warning-dark: #A66B38;
 $color-danger: #de2a11;
-$color-danger-lighter: #dd5454; // Between $color-danger and $color-danger-light
+$color-danger-lighter: #dd5454;
 $color-danger-light: #ffe6e6;
 $color-danger-dark: darken($color-danger, 10%);
-$color-highlight: #faf1cd;
+$color-highlight: #FAF5E8;
 
-// Buttons and inputs
-$color-action-foreground: #0c7bd1;
-$color-action-background: #009ecc;
-$color-action-background-hover: #0086ad;
-$color-action-background-disabled: #999;
-$color-action-light: #d0e7f1;
-$color-action-overlay: #0096c1;
-$color-input: #555;
-$color-input-inactive: #777;
+// Buttons and inputs - THEO green primary
+$color-action-foreground: $color-geo-green;
+$color-action-background: $color-geo-green;
+$color-action-background-hover: $color-geo-green-dark;
+$color-action-background-disabled: $color-geo-gray;
+$color-action-light: #E8EFEC;
+$color-action-overlay: $color-geo-green;
+$color-input: $color-geo-dark;
+$color-input-inactive: $color-geo-gray;
 $font-size-btn: 12px;
 $hpadding-btn: 10px;
 $padding-bottom-btn: 5px;
@@ -68,27 +84,27 @@ $font-size-dropdown-menu: $font-size-btn;
 $min-width-dropdown-menu: 150px;
 
 // <dl>
-$border-bottom-dl: 1px solid #ddd;
+$border-bottom-dl: 1px solid $color-geo-border;
 $padding-block-dl: 10px;
 
 // Forms
 $padding-top-form-control: 6px;
 
-// Tables
+// Tables - THEO styled
 $margin-bottom-table: 20px;
 // Heading
-$border-bottom-table-heading: 1px solid #bbb;
-$color-table-heading-background: #ddd;
+$border-bottom-table-heading: 1px solid $color-geo-border;
+$color-table-heading-background: $color-geo-bg;
 $font-size-table-heading: 12px;
 $padding-table-heading: 8px 9px 6px;
 // Data
-$border-top-table-data: 1px solid #ddd;
+$border-top-table-data: 1px solid $color-geo-border;
 $padding-bottom-table-data: 8px;
 $padding-left-table-data: 8px;
 $padding-right-table-data: 8px;
 $padding-top-table-data: 8px;
 // Row
-$color-selected-row: #E4EDF1;
+$color-selected-row: #E8EFEC;
 
 // Panels
 $box-shadow-panel-main: 0 0 24px rgba(0, 0, 0, 0.25), 0 35px 115px rgba(0, 0, 0, 0.28);
@@ -97,10 +113,10 @@ $padding-panel-body: 15px;
 // Navs
 $hpadding-nav-tab: 8px;
 
-$color-subpanel-background: #eee;
-$color-subpanel-active: #ddd;
-$color-subpanel-border: #e6e6e6;
-$color-subpanel-border-strong: #c3c3c3;
+$color-subpanel-background: $color-geo-card;
+$color-subpanel-active: $color-geo-border;
+$color-subpanel-border: $color-geo-border;
+$color-subpanel-border-strong: darken($color-geo-border, 10%);
 
 // Easing
 $ease-extreme-out: cubic-bezier(.05, .9, 0, 1);
@@ -115,7 +131,7 @@ $padding-bottom-expandable-row: 16px;
 $padding-top-expandable-row: 8px;
 
 // FeedEntry
-$background-color-feed-entry: #f9f9f9;
+$background-color-feed-entry: $color-geo-card;
 $hpadding-feed-entry: 15px;
 
 // FileDropZone

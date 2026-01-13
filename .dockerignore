@@ -1,0 +1,38 @@
+# Dependencies
+node_modules
+
+# Build output
+dist
+
+# Development files
+.git
+.gitignore
+*.md
+README*
+NOTICE
+LICENSE
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Test files
+test
+e2e-tests
+coverage
+*.spec.js
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp
+temp
+*.tmp
