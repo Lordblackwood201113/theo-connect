@@ -44,37 +44,63 @@ export default {
 
 <style lang="scss">
 @import '../../../assets/scss/mixins';
+@import '../../../assets/scss/variables';
 
 .home-summary-item {
-  padding: 16px;
+  padding: 20px;
   background-color: white;
   border-radius: 12px;
-  border: 1px solid #E3E4E4;
+  border: 1px solid $color-geo-border;
   flex: 1 1 0px;
+  min-width: 200px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: $color-geo-green;
+    box-shadow: 0 4px 12px rgba(45, 79, 66, 0.1);
+    transform: translateY(-2px);
+  }
 
   .heading {
     align-items: center;
     display: flex;
-    gap: 16px;
-    margin-bottom: 16px;
+    gap: 14px;
+    margin-bottom: 12px;
 
     > [class^="icon-"] {
-      @include icon-box;
-      font-size: 24px;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, $color-geo-green 0%, $color-geo-green-dark 100%);
+      border-radius: 10px;
+      color: white;
+      font-size: 20px;
     }
   }
 
   .header {
-    font-size: 16px;
-    margin-bottom: 0;
+    font-size: 28px;
+    margin-bottom: 2px;
     line-height: 1;
-    font-weight: 600;
+    font-weight: 700;
+    color: $color-geo-dark;
+  }
+
+  .subheader {
+    font-size: 13px;
+    color: $color-geo-gray;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
 
   .body {
-    font-size: 12px;
-    line-height: 16px;
+    font-size: 13px;
+    line-height: 1.5;
     margin-bottom: 0;
+    color: $color-geo-gray;
   }
 }
 </style>

@@ -179,14 +179,69 @@ export default {
 </script>
 
 <style lang="scss">
+@import '../../assets/scss/variables';
 
-#project-list-archived {
-  .project-title {
-    font-size: 24px;
+#project-list {
+  #project-list-new-button {
+    border-radius: 8px;
+    padding: 8px 16px;
     font-weight: 500;
+    transition: all 0.2s ease;
+
+    .icon-plus-circle {
+      margin-right: 6px;
+    }
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(45, 79, 66, 0.3);
+    }
+  }
+
+  .empty-table-message {
+    text-align: center;
+    padding: 48px 24px;
+    background: $color-geo-card;
+    border-radius: 12px;
+    border: 1px dashed $color-geo-border;
+    color: $color-geo-gray;
+    font-size: 15px;
+    line-height: 1.6;
   }
 }
 
+#project-list-archived {
+  margin-top: 32px;
+
+  > div {
+    display: grid;
+    gap: 8px;
+  }
+
+  .project-title {
+    font-size: 16px;
+    font-weight: 500;
+    padding: 12px 16px;
+    background: $color-geo-card;
+    border-radius: 8px;
+    border: 1px solid $color-geo-border;
+    transition: all 0.15s ease;
+
+    &:hover {
+      background: $color-geo-bg;
+      transform: translateX(4px);
+    }
+
+    a {
+      color: $color-geo-gray;
+      text-decoration: none;
+
+      &:hover {
+        color: $color-geo-green;
+      }
+    }
+  }
+}
 </style>
 
 <i18n lang="json5">

@@ -152,89 +152,122 @@ export default {
 @import '../../assets/scss/mixins';
 
 .project-home-block {
-  margin-bottom: 15px;
+  margin-bottom: 24px;
+  background: $color-geo-card;
+  border-radius: 12px;
+  padding: 20px 24px;
+  border: 1px solid $color-geo-border;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+  }
 
   .title {
-    font-size: 24px;
-    font-weight: bold;
+    font-size: 20px;
+    font-weight: 600;
     letter-spacing: -0.02em;
-    margin-bottom: 5px;
-    background-color: $color-page-background;
-    box-shadow: 0 0 20px $color-page-background;
-    position: sticky;
-    top: 0;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid $color-geo-border;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    a {
+      color: $color-geo-dark;
+      text-decoration: none;
+      transition: color 0.15s ease;
+
+      &:hover {
+        color: $color-geo-green;
+      }
+    }
   }
 
   .encrypted {
-    margin-left: 9px;
-    color: #333;
-    background-color: #ddd;
-    border: 1px solid #ccc;
-    font-weight: 400;
+    font-size: 11px;
+    color: $color-geo-gray;
+    background-color: $color-geo-bg;
+    border: 1px solid $color-geo-border;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-weight: 500;
   }
 
-  padding-right: 12px;
-
   table {
-    margin-left: 9px;
-    margin-bottom: 4px;
+    margin-bottom: 0;
+    width: 100%;
   }
 
   .expand-button-container {
-    padding-left: 6px;
-    font-size: 14px;
-    color: #888;
+    padding: 12px 0 4px;
+    font-size: 13px;
+    color: $color-geo-gray;
   }
+
   .expand-button {
     @include text-link;
+    color: $color-geo-green;
+    font-weight: 500;
+
+    &:hover {
+      color: $color-geo-green-dark;
+    }
+
     &:focus {
       background-color: transparent;
     }
   }
 
   .icon-angle-down, .icon-angle-up {
-    margin-left: 5px;
+    margin-left: 6px;
   }
 
   .project-table {
-    .transparent-bg{
+    border-collapse: separate;
+    border-spacing: 0;
+
+    .transparent-bg {
       background: transparent !important;
     }
 
     tr:first-child .col-icon {
-      border-top-left-radius: 5px;
+      border-top-left-radius: 8px;
     }
 
     tr:last-child .col-icon {
-      border-bottom-left-radius: 5px;
+      border-bottom-left-radius: 8px;
     }
 
-    tr:nth-child(3n + 2 of .project-form-row) {
-      background: #eee;
+    tr:nth-child(odd of .project-form-row) {
+      background: rgba(0, 0, 0, 0.02);
     }
 
-    tr:nth-child(3n + 2 of .project-dataset-row) {
-      background: #eee;
+    tr:nth-child(odd of .project-dataset-row) {
+      background: rgba(0, 0, 0, 0.02);
     }
 
     .col-icon {
-      width: 35px;
-      background: #e3e4e4;
-      border-right-width: 2px;
+      width: 40px;
+      background: $color-geo-bg;
+      border-right-width: 3px;
       border-right-style: solid;
-      padding: 5px 0px;
+      padding: 8px 0;
       text-align: center;
 
       span {
         margin-left: 0;
+        font-size: 14px;
       }
     }
 
     .project-form-row .col-icon {
-      border-right-color: #009ccc;
+      border-right-color: $color-geo-green;
 
       span {
-        color: #009ccc;
+        color: $color-geo-green;
       }
     }
 
@@ -244,14 +277,15 @@ export default {
         padding: 0 $padding-right-table-data;
 
         [class*='icon'] {
-          margin-right:0;
+          margin-right: 0;
         }
 
         .btn-danger {
           color: white;
           margin-right: -5px;
-          font-size: 14px;
-          padding: 2px 7px;
+          font-size: 13px;
+          padding: 4px 10px;
+          border-radius: 4px;
 
           [class*='icon'] {
             color: white;
@@ -259,33 +293,30 @@ export default {
         }
       }
 
-      .col-icon{
-        border-right-color: #b9005c;
+      .col-icon {
+        border-right-color: $color-geo-orange;
 
         span {
-          color: #b9005c;
+          color: $color-geo-orange;
         }
       }
 
       .conflict-caption {
-        font-size: 14px;
-        color: #888;
-        padding: 6px 10px;
+        font-size: 13px;
+        color: $color-geo-gray;
+        padding: 8px 12px;
       }
     }
 
     .margin {
-      height: 5px;
+      height: 8px;
 
       .col-icon {
         border-right: none;
-        width: 33px;
+        width: 37px;
       }
     }
   }
-
-
-
 }
 </style>
 

@@ -71,25 +71,28 @@ if (currentUser.can('user.list'))
 @import '../../assets/scss/variables';
 
 #home-summary-container {
-  background-color: $color-subpanel-background;
+  background: linear-gradient(180deg, $color-geo-bg 0%, white 100%);
   margin-left: -15px;
   margin-right: -15px;
-  padding: 20px;
+  padding: 32px 20px;
+  border-bottom: 1px solid $color-geo-border;
 }
 
 #home-summary {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-
-  @media (max-width: $screen-sm-min) {
-    > * {
-      flex: 1 1 calc(50% - 20px);
-    }
-  }
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
   margin-left: auto;
   margin-right: auto;
   max-width: $max-width-page-body;
+
+  @media (max-width: $screen-sm-min) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
 
