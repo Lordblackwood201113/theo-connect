@@ -10,54 +10,110 @@ including this file, may be copied, modified, propagated, or distributed
 except according to the terms contained in the LICENSE file.
 -->
 <template>
-  <div id="account-login" class="row">
-    <div class="col-xs-12 col-sm-offset-3 col-sm-6">
-      <div class="panel panel-default panel-main">
-        <div class="panel-heading">
-          <h1 class="panel-title">{{ $t('action.logIn') }}</h1>
+  <div id="account-login">
+    <div class="login-container">
+      <!-- Logo et Branding -->
+      <div class="login-header">
+        <div class="login-logo">
+          <span class="logo-icon">T</span>
         </div>
-        <div v-if="config.oidcEnabled" class="panel-body">
-          <p>{{ $t('oidc.body') }}</p>
-          <div class="panel-footer">
-            <a :href="oidcLoginPath" class="btn btn-primary"
-              :class="{ disabled }" @click="loginByOIDC">
-              {{ $t('action.continue') }} <spinner :state="disabled"/>
-            </a>
-          </div>
+        <h1 class="login-title">THEO COLLECT</h1>
+        <p class="login-subtitle">{{ $t('subtitle') }}</p>
+      </div>
+
+      <!-- Carte de connexion -->
+      <div class="login-card">
+        <!-- OIDC Login -->
+        <div v-if="config.oidcEnabled" class="login-content">
+          <p class="oidc-message">{{ $t('oidc.body') }}</p>
+          <a :href="oidcLoginPath" class="login-btn login-btn-primary"
+            :class="{ disabled }" @click="loginByOIDC">
+            {{ $t('action.continue') }}
+            <spinner :state="disabled"/>
+          </a>
         </div>
-        <div v-else class="panel-body">
+
+        <!-- Standard Login Form -->
+        <div v-else class="login-content">
           <form @submit.prevent="submit">
-            <form-group ref="email" v-model.trim="email" type="email"
-              :placeholder="$t('field.email')" required autocomplete="off"/>
-            <form-group v-model="password" type="password"
-              :placeholder="$t('field.password')" required
-              autocomplete="current-password"/>
-            <div v-if="showMailingListOptIn" id="mailing-list-opt-in" class="checkbox">
-              <label>
-                <input v-model="mailingListOptIn" type="checkbox">{{ $t('analytics.mailingListOptIn') }}
+            <div class="form-field">
+              <input
+                ref="email"
+                v-model.trim="email"
+                type="email"
+                class="login-input"
+                :placeholder="$t('field.email')"
+                required
+                autocomplete="off"
+                @focus="emailFocused = true"
+                @blur="emailFocused = email.length > 0"
+              >
+              <label class="login-label" :class="{ active: emailFocused || email }">
+                {{ $t('field.email') }}
+              </label>
+              <span class="input-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                  <polyline points="22,6 12,13 2,6"/>
+                </svg>
+              </span>
+            </div>
+
+            <div class="form-field">
+              <input
+                v-model="password"
+                :type="showPassword ? 'text' : 'password'"
+                class="login-input"
+                :placeholder="$t('field.password')"
+                required
+                autocomplete="current-password"
+                @focus="passwordFocused = true"
+                @blur="passwordFocused = password.length > 0"
+              >
+              <label class="login-label" :class="{ active: passwordFocused || password }">
+                {{ $t('field.password') }}
+              </label>
+              <button type="button" class="password-toggle" @click="showPassword = !showPassword">
+                <svg v-if="!showPassword" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                <svg v-else xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                  <line x1="1" y1="1" x2="23" y2="23"/>
+                </svg>
+              </button>
+            </div>
+
+            <div v-if="showMailingListOptIn" class="mailing-opt-in">
+              <label class="checkbox-container">
+                <input v-model="mailingListOptIn" type="checkbox">
+                <span class="checkmark"></span>
+                {{ $t('analytics.mailingListOptIn') }}
               </label>
             </div>
-            <div class="panel-footer">
-              <button type="submit" class="btn btn-primary"
-                :aria-disabled="disabled">
-                {{ $t('action.logIn') }} <spinner :state="disabled"/>
-              </button>
-              <router-link v-slot="{ navigate }" to="/reset-password" custom>
-                <button type="button" class="btn btn-link" :aria-disabled="disabled"
-                  @click="navigate">
-                  {{ $t('action.resetPassword') }}
-                </button>
-              </router-link>
-            </div>
+
+            <button type="submit" class="login-btn login-btn-primary" :disabled="disabled">
+              <span v-if="!disabled">{{ $t('action.logIn') }}</span>
+              <spinner v-else :state="disabled"/>
+            </button>
+
+            <router-link to="/reset-password" class="forgot-password">
+              {{ $t('action.resetPassword') }}
+            </router-link>
           </form>
         </div>
       </div>
+
+      <!-- Footer -->
+      <p class="login-footer">
+        {{ $t('footer') }}
+      </p>
     </div>
   </div>
 </template>
 
 <script>
-import FormGroup from '../form-group.vue';
 import Spinner from '../spinner.vue';
 
 import { enketoBasePath, noop } from '../../util/util';
@@ -68,7 +124,7 @@ import { useRequestData } from '../../request-data';
 
 export default {
   name: 'AccountLogin',
-  components: { FormGroup, Spinner },
+  components: { Spinner },
   inject: ['container', 'alert', 'config', 'location'],
   beforeRouteLeave() {
     return !this.disabled;
@@ -83,6 +139,9 @@ export default {
       email: '',
       password: '',
       mailingListOptIn: true,
+      showPassword: false,
+      emailFocused: false,
+      passwordFocused: false,
     };
   },
   computed: {
@@ -102,7 +161,7 @@ export default {
   mounted() {
     if (this.config.oidcEnabled)
       window.addEventListener('pageshow', this.reenableIfPersisted);
-    else
+    else if (this.$refs.email)
       this.$refs.email.focus();
   },
   beforeUnmount() {
@@ -218,9 +277,267 @@ export default {
 };
 </script>
 
+<style lang="scss" scoped>
+@import '../../assets/scss/variables';
+
+#account-login {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, $color-geo-bg 0%, darken($color-geo-bg, 3%) 100%);
+  padding: 20px;
+}
+
+.login-container {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.login-logo {
+  margin-bottom: 16px;
+}
+
+.logo-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, $color-geo-green 0%, $color-geo-green-dark 100%);
+  border-radius: 16px;
+  color: white;
+  font-size: 32px;
+  font-weight: 800;
+  box-shadow: 0 8px 24px rgba($color-geo-green, 0.3);
+}
+
+.login-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: $color-geo-dark;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.02em;
+}
+
+.login-subtitle {
+  font-size: 14px;
+  color: $color-geo-gray;
+  margin: 0;
+}
+
+.login-card {
+  width: 100%;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.login-content {
+  padding: 32px;
+}
+
+.form-field {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.login-input {
+  width: 100%;
+  padding: 16px 48px 16px 16px;
+  font-size: 15px;
+  border: 2px solid $color-geo-border;
+  border-radius: 12px;
+  background: white;
+  color: $color-geo-dark;
+  transition: all 0.2s ease;
+  outline: none;
+
+  &::placeholder {
+    color: transparent;
+  }
+
+  &:focus {
+    border-color: $color-geo-green;
+    box-shadow: 0 0 0 4px rgba($color-geo-green, 0.1);
+  }
+
+  &:focus + .login-label,
+  &:not(:placeholder-shown) + .login-label {
+    transform: translateY(-28px) scale(0.85);
+    color: $color-geo-green;
+    background: white;
+    padding: 0 6px;
+  }
+}
+
+.login-label {
+  position: absolute;
+  left: 14px;
+  top: 16px;
+  font-size: 15px;
+  color: $color-geo-gray;
+  pointer-events: none;
+  transition: all 0.2s ease;
+  transform-origin: left;
+
+  &.active {
+    transform: translateY(-28px) scale(0.85);
+    color: $color-geo-green;
+    background: white;
+    padding: 0 6px;
+  }
+}
+
+.input-icon {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: $color-geo-gray;
+  pointer-events: none;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: $color-geo-gray;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: $color-geo-green;
+  }
+}
+
+.mailing-opt-in {
+  margin-bottom: 24px;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: $color-geo-gray;
+  cursor: pointer;
+
+  input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: $color-geo-green;
+  }
+}
+
+.login-btn {
+  width: 100%;
+  padding: 16px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+
+  &.login-btn-primary {
+    background: linear-gradient(135deg, $color-geo-green 0%, $color-geo-green-dark 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba($color-geo-green, 0.3);
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba($color-geo-green, 0.4);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    &:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+  }
+
+  &.disabled {
+    opacity: 0.7;
+    pointer-events: none;
+  }
+}
+
+.forgot-password {
+  display: block;
+  text-align: center;
+  margin-top: 20px;
+  font-size: 14px;
+  color: $color-geo-gray;
+  text-decoration: none;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: $color-geo-green;
+  }
+}
+
+.oidc-message {
+  text-align: center;
+  color: $color-geo-gray;
+  margin-bottom: 24px;
+  font-size: 14px;
+}
+
+.login-footer {
+  margin-top: 24px;
+  font-size: 12px;
+  color: $color-geo-gray;
+  text-align: center;
+}
+
+// Responsive adjustments
+@media (max-width: 480px) {
+  .login-content {
+    padding: 24px;
+  }
+
+  .logo-icon {
+    width: 56px;
+    height: 56px;
+    font-size: 28px;
+  }
+
+  .login-title {
+    font-size: 20px;
+  }
+}
+</style>
+
 <i18n lang="json5">
 {
   "en": {
+    "subtitle": "Geo-referenced agricultural data collection",
+    "footer": "Powered by THEO COLLECT",
     "alert": {
       "alreadyLoggedIn": "A user is already logged in. Please refresh the page to continue.",
       "changePassword": "To protect your account, make sure your password is 10 characters or longer."
@@ -298,9 +615,11 @@ export default {
     }
   },
   "fr": {
+    "subtitle": "Collecte de donnees agricoles geo-referencees",
+    "footer": "Propulse par THEO COLLECT",
     "alert": {
-      "alreadyLoggedIn": "Un utilisateur est déjà connecté. Merci de rafraîchir la page pour continuer.",
-      "changePassword": "Pour protéger votre compte, assurez vous de choisir un mot de passe d'au moins 10 caractères."
+      "alreadyLoggedIn": "Un utilisateur est deja connecte. Merci de rafraichir la page pour continuer.",
+      "changePassword": "Pour proteger votre compte, assurez vous de choisir un mot de passe d'au moins 10 caracteres."
     },
     "oidc": {
       "body": "Cliquez sur Continuer pour accéder à la page de connexion.",
