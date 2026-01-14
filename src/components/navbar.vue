@@ -22,7 +22,10 @@ except according to the terms contained in the LICENSE file.
             <span class="navbar-icon-bar"></span>
             <span class="navbar-icon-bar"></span>
           </button>
-          <router-link to="/" class="navbar-brand">THEO COLLECT</router-link>
+          <router-link to="/" class="navbar-brand">
+            <span class="brand-icon">T</span>
+            <span class="brand-text">THEO COLLECT</span>
+          </router-link>
         </div>
         <div class="collapse navbar-collapse">
           <navbar-links v-if="visiblyLoggedIn"/>
@@ -92,58 +95,153 @@ export default {
 </script>
 
 <style lang="scss">
+@import '../assets/scss/variables';
 @import '../assets/scss/mixins';
 
-$border-height: 3px;
-
 .navbar-default {
-  background-color: $color-accent-primary;
+  background-color: white;
   border: none;
-  border-top: $border-height solid $color-accent-secondary;
-  box-shadow: 0 $border-height 0 #dedede;
-  height: 30px + $border-height; // the way bootstrap is set up, the border eats the body.
+  border-bottom: 1px solid $color-geo-border;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  height: 56px;
   margin-bottom: 0;
   min-height: auto;
+  transition: box-shadow 0.2s ease;
+
+  .container-fluid {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .navbar-header {
+    display: flex;
+    align-items: center;
+    height: 100%;
+  }
 
   .navbar-brand {
-    float: left;
-    font-size: $font-size-btn;
-    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    font-weight: 700;
     height: auto;
     letter-spacing: -0.02em;
-    line-height: 20px;
-    padding: 5px 15px;
+    line-height: 1;
+    padding: 0 15px;
+    text-decoration: none;
+    transition: opacity 0.15s ease;
 
-    &, &:hover, &:focus { color: #fff; }
+    &:hover {
+      opacity: 0.8;
+    }
+
+    .brand-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, $color-geo-green 0%, $color-geo-green-dark 100%);
+      border-radius: 8px;
+      color: white;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .brand-text {
+      color: $color-geo-dark;
+    }
 
     &:focus {
       background-color: transparent;
       text-decoration: none;
+      outline: none;
     }
   }
 
   .navbar-nav {
-    font-size: $font-size-btn;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    margin: 0;
 
-    > li > a {
-      &, &:hover, &:focus { color: #fff; }
+    > li {
+      height: 100%;
+      display: flex;
+      align-items: center;
+
+      > a {
+        color: $color-geo-gray;
+        padding: 8px 14px;
+        border-radius: 6px;
+        transition: all 0.15s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        &:hover {
+          color: $color-geo-dark;
+          background-color: $color-geo-bg;
+        }
+
+        &:focus {
+          color: $color-geo-dark;
+          background-color: $color-geo-bg;
+          outline: none;
+        }
+      }
     }
+
+    .active > a {
+      color: $color-geo-green;
+      background-color: rgba($color-geo-green, 0.08);
+
+      &:hover, &:focus {
+        color: $color-geo-green;
+        background-color: rgba($color-geo-green, 0.12);
+      }
+    }
+
+    .open > a {
+      color: $color-geo-green;
+      background-color: $color-geo-bg;
+
+      &:hover, &:focus {
+        color: $color-geo-green;
+        background-color: $color-geo-bg;
+      }
+    }
+  }
+
+  .navbar-collapse {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    height: 100%;
   }
 }
 
 #navbar-analytics-notice {
   @include text-link;
-  background-color: #ffed88;
-  border: 1px solid #e39941;
+  background-color: $color-warning-light;
+  border: 1px solid $color-warning;
+  border-radius: 4px;
   float: left;
-  font-size: 10px;
-  margin-top: 6px;
-  margin-right: 30px;
-  padding: 1px 3px;
+  font-size: 11px;
+  font-weight: 500;
+  margin-right: 16px;
+  padding: 4px 8px;
+  color: $color-warning-dark;
+  transition: all 0.15s ease;
 
   &:hover, &:focus {
-    background-color: #ffdc1c;
-    border-color: #ffed88;
+    background-color: $color-warning;
+    color: white;
   }
 }
 
@@ -152,89 +250,147 @@ $border-height: 3px;
   .navbar-default {
     border-radius: 0;
 
-    .navbar-brand { margin-left: -15px; }
-
-    .navbar-nav {
-      margin-top: -1 * $border-height;
-
-      > li > a {
-        border-top: transparent solid $border-height;
-        padding: 5px 10px;
-        transition: 0.25s border-top-color;
-
-        &:hover {
-          border-top-color: transparentize(#fff, 0.3);
-          transition-duration: 0s;
-        }
-
-        &:focus {
-          border-top-color: transparentize(#fff, 0.15);
-          box-shadow: 0 3px 0 transparentize(#000, 0.9);
-          outline: none;
-          transition-duration: 0s;
-        }
-      }
-
-      .active > a, .open > a {
-        box-shadow: 0 0 6px transparentize($color-accent-secondary, 0.7) inset;
-
-        &, &:hover, &:focus {
-          background-color: #b40066;
-          border-top-color: #fff;
-          color: #fff;
-        }
-      }
+    .navbar-brand {
+      margin-left: 0;
     }
   }
 
   .navbar-right {
-    // Counters the 15px padding of .navbar-collapse and the 15px padding of
-    // .container-fluid. The Bootstrap default is -15px.
-    margin-right: -25px;
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    margin-right: 0;
   }
 
-  #navbar-actions { margin-left: 10px; }
+  #navbar-actions {
+    margin-left: 8px;
+  }
 }
 
 // Navbar is collapsed.
 @media (max-width: 767px) {
   .navbar-default {
+    height: auto;
+    min-height: 56px;
+    padding: 8px 0;
+
+    .container-fluid {
+      flex-wrap: wrap;
+    }
+
+    .navbar-header {
+      width: 100%;
+      justify-content: space-between;
+    }
+
     .navbar-toggle {
       border: none;
-      margin: -2px 5px;
+      padding: 8px;
+      margin: 0;
+      border-radius: 6px;
+      background-color: transparent;
+      transition: background-color 0.15s ease;
 
-      &:hover, &:focus { background-color: inherit; }
+      &:hover, &:focus {
+        background-color: $color-geo-bg;
+      }
 
-      .navbar-icon-bar { background-color: #fff; }
+      .navbar-icon-bar {
+        background-color: $color-geo-dark;
+        width: 20px;
+        height: 2px;
+        border-radius: 1px;
+        display: block;
+        margin: 4px 0;
+      }
     }
 
     .navbar-collapse {
-      background-color: $color-accent-secondary;
-      border: none;
-      position: relative;
-      z-index: 99;
+      width: 100%;
+      background-color: white;
+      border-top: 1px solid $color-geo-border;
+      margin-top: 8px;
+      padding-top: 8px;
+      flex-direction: column;
+      align-items: stretch;
     }
 
     .navbar-nav {
-      margin-top: 0;
+      flex-direction: column;
+      width: 100%;
 
-      .active > a, .open > a {
-        border-left: $border-height solid #fff;
-        padding-left: 15px - $border-height;
+      > li {
+        width: 100%;
 
-        &, &:hover, &:focus {
-          background-color: $color-accent-secondary;
-          color: #fff;
+        > a {
+          width: 100%;
+          padding: 12px 16px;
+          border-radius: 8px;
         }
       }
 
-      .open .dropdown-menu > li > a {
-        &, &:hover, &:focus { color: #fff; }
+      .active > a {
+        border-left: 3px solid $color-geo-green;
+        border-radius: 0 8px 8px 0;
+        padding-left: 13px;
       }
+
+      .open .dropdown-menu {
+        background-color: $color-geo-bg;
+        border-radius: 8px;
+        margin: 4px 0;
+        padding: 8px;
+
+        > li > a {
+          color: $color-geo-gray;
+          padding: 10px 12px;
+          border-radius: 6px;
+
+          &:hover, &:focus {
+            color: $color-geo-dark;
+            background-color: white;
+          }
+        }
+      }
+    }
+
+    .navbar-right {
+      width: 100%;
+      flex-direction: column;
+      margin: 0;
     }
   }
 
-  #navbar-analytics-notice { display: none; }
+  #navbar-analytics-notice {
+    display: none;
+  }
+}
+
+// Dropdown menus styling
+.navbar-default .dropdown-menu {
+  background-color: white;
+  border: 1px solid $color-geo-border;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 8px;
+  margin-top: 4px;
+
+  > li > a {
+    color: $color-geo-gray;
+    padding: 10px 14px;
+    border-radius: 6px;
+    transition: all 0.15s ease;
+
+    &:hover, &:focus {
+      color: $color-geo-dark;
+      background-color: $color-geo-bg;
+    }
+  }
+
+  .divider {
+    background-color: $color-geo-border;
+    margin: 8px 0;
+  }
 }
 </style>
 
