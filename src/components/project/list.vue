@@ -14,56 +14,21 @@ except according to the terms contained in the LICENSE file.
     <page-section>
       <template #heading>
         <span>{{ $t('resource.projects') }}</span>
+        <button v-if="currentUser.can('project.create')"
+          id="project-list-new-button" type="button" class="btn btn-primary"
+          @click="createModal.show()">
+          <span class="icon-plus-circle"></span>{{ $t('action.create') }}&hellip;
+        </button>
+        <project-sort v-model="sortMode"/>
       </template>
       <template #body>
-        <!-- Toolbar with search, sort, and create -->
-        <div class="project-list-toolbar">
-          <div class="search-container">
-            <span class="icon-search"></span>
-            <input
-              v-model="searchQuery"
-              type="text"
-              class="search-input"
-              :placeholder="$t('searchPlaceholder')"
-            >
-            <button v-if="searchQuery" class="search-clear" @click="searchQuery = ''">
-              <span class="icon-close"></span>
-            </button>
-          </div>
-          <div class="toolbar-actions">
-            <project-sort v-model="sortMode"/>
-            <button v-if="currentUser.can('project.create')"
-              id="project-list-new-button" type="button" class="btn btn-primary"
-              @click="createModal.show()">
-              <span class="icon-plus-circle"></span>{{ $t('action.create') }}
-            </button>
-          </div>
-        </div>
-
-        <!-- Projects count -->
-        <div v-if="projects.dataExists && filteredProjects.length > 0" class="projects-count">
-          {{ $tcn('projectCount', filteredProjects.length) }}
-          <span v-if="searchQuery" class="search-filter-info">
-            ({{ $t('filtered') }})
-          </span>
-        </div>
-
-        <!-- Project cards -->
         <div v-if="projects.dataExists" class="project-cards-container">
-          <project-home-block v-for="project of displayedProjects" :key="project.id"
+          <project-home-block v-for="project of chunkyProjects" :key="project.id"
             :project="project" :sort-func="sortFunction"
             :max-forms="maxForms" :max-datasets="maxDatasets"/>
         </div>
-
-        <!-- No results message -->
-        <div v-if="projects.dataExists && filteredProjects.length === 0 && searchQuery" class="no-results">
-          <span class="icon-search"></span>
-          <p>{{ $t('noResults', { query: searchQuery }) }}</p>
-          <button class="btn btn-link" @click="searchQuery = ''">{{ $t('clearSearch') }}</button>
-        </div>
-
         <loading :state="projects.initiallyLoading"/>
-        <p v-if="projects.dataExists && activeProjects.length === 0 && !searchQuery"
+        <p v-if="projects.dataExists && activeProjects.length === 0"
           class="empty-table-message">
           <template v-if="currentUser.can('project.create')">
             {{ $t('emptyTable.canCreate') }}<sentence-separator/>
@@ -130,9 +95,6 @@ export default {
   setup() {
     const { currentUser, projects } = useRequestData();
 
-    // Search query
-    const searchQuery = ref('');
-
     const sortMode = computed({
       get() {
         // currentUser.preferences goes missing on logout, see https://github.com/getodk/central-frontend/pull/1024#pullrequestreview-2332522640
@@ -152,32 +114,13 @@ export default {
         : [];
     });
     watchEffect(() => { activeProjects.value.sort(sortFunction.value); });
-
-    // Filtered projects based on search query
-    const filteredProjects = computed(() => {
-      if (!activeProjects.value) return [];
-      if (!searchQuery.value.trim()) return activeProjects.value;
-
-      const query = searchQuery.value.toLowerCase().trim();
-      return activeProjects.value.filter(project => {
-        // Search in project name
-        if (project.name.toLowerCase().includes(query)) return true;
-        // Search in form names
-        if (project.formList?.some(form => form.name?.toLowerCase().includes(query))) return true;
-        // Search in dataset names
-        if (project.datasetList?.some(ds => ds.name?.toLowerCase().includes(query))) return true;
-        return false;
-      });
-    });
-
-    const displayedProjects = useChunkyArray(filteredProjects);
+    const chunkyProjects = useChunkyArray(activeProjects);
 
     const { projectPath } = useRoutes();
     return {
       currentUser, projects,
-      searchQuery,
       sortMode, sortFunction,
-      activeProjects, filteredProjects, displayedProjects,
+      activeProjects, chunkyProjects,
       createModal: modalData(),
       projectPath
     };
@@ -239,97 +182,11 @@ export default {
 @import '../../assets/scss/variables';
 
 #project-list {
-  // Toolbar
-  .project-list-toolbar {
+  // Project cards container
+  .project-cards-container {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-
-    @media (max-width: 600px) {
-      flex-direction: column;
-      align-items: stretch;
-    }
-  }
-
-  // Search container
-  .search-container {
-    position: relative;
-    flex: 1;
-    max-width: 400px;
-    min-width: 200px;
-
-    @media (max-width: 600px) {
-      max-width: 100%;
-    }
-
-    .icon-search {
-      position: absolute;
-      left: 14px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: $color-geo-gray;
-      font-size: 14px;
-    }
-
-    .search-input {
-      width: 100%;
-      padding: 12px 40px 12px 42px;
-      border: 1px solid $color-geo-border;
-      border-radius: 10px;
-      font-size: 14px;
-      background: white;
-      transition: all 0.2s ease;
-
-      &:focus {
-        outline: none;
-        border-color: $color-geo-green;
-        box-shadow: 0 0 0 3px rgba(45, 79, 66, 0.1);
-      }
-
-      &::placeholder {
-        color: $color-geo-gray;
-      }
-    }
-
-    .search-clear {
-      position: absolute;
-      right: 8px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: $color-geo-bg;
-      border: none;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.15s ease;
-
-      .icon-close {
-        font-size: 10px;
-        color: $color-geo-gray;
-      }
-
-      &:hover {
-        background: $color-geo-border;
-      }
-    }
-  }
-
-  // Toolbar actions
-  .toolbar-actions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-
-    @media (max-width: 600px) {
-      justify-content: space-between;
-    }
+    flex-direction: column;
+    gap: 0;
   }
 
   #project-list-new-button {
@@ -345,52 +202,6 @@ export default {
     &:hover {
       transform: translateY(-1px);
       box-shadow: 0 2px 8px rgba(45, 79, 66, 0.3);
-    }
-  }
-
-  // Projects count
-  .projects-count {
-    font-size: 13px;
-    color: $color-geo-gray;
-    margin-bottom: 16px;
-    font-weight: 500;
-
-    .search-filter-info {
-      color: $color-geo-green;
-    }
-  }
-
-  // Project cards container
-  .project-cards-container {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-  }
-
-  // No results
-  .no-results {
-    text-align: center;
-    padding: 60px 24px;
-    background: $color-geo-card;
-    border-radius: 12px;
-    border: 1px dashed $color-geo-border;
-
-    .icon-search {
-      font-size: 48px;
-      color: $color-geo-border;
-      margin-bottom: 16px;
-      display: block;
-    }
-
-    p {
-      color: $color-geo-gray;
-      font-size: 15px;
-      margin-bottom: 12px;
-    }
-
-    .btn-link {
-      color: $color-geo-green;
-      font-weight: 500;
     }
   }
 
@@ -455,13 +266,7 @@ export default {
     },
     "alert": {
       "create": "Your new Project has been successfully created."
-    },
-    // Search functionality
-    "searchPlaceholder": "Search projects...",
-    "projectCount": "{count} Project | {count} Projects",
-    "filtered": "filtered",
-    "noResults": "No projects found for \"{query}\"",
-    "clearSearch": "Clear search"
+    }
   }
 }
 </i18n>
@@ -519,12 +324,7 @@ export default {
     },
     "alert": {
       "create": "Votre nouveau projet a été créé avec succès."
-    },
-    "searchPlaceholder": "Rechercher des projets...",
-    "projectCount": "{count} Projet | {count} Projets",
-    "filtered": "filtré",
-    "noResults": "Aucun projet trouvé pour \"{query}\"",
-    "clearSearch": "Effacer la recherche"
+    }
   },
   "id": {
     "archived": "Proyek Terarsip",
