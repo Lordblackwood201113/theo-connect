@@ -34,7 +34,7 @@ export const onRequest = async ({ request, next }) => {
   const upstream = await fetch(`${ORIGIN}${url.pathname}${url.search}`, init);
   const response = new Response(upstream.body, upstream);
 
-  // Strip Domain= so Set-Cookie binds to the current host (theo-collect.locagri-app.com),
+  // Strip Domain= so Set-Cookie binds to the current host (theo-connect.locagri-app.com),
   // mirroring nginx `proxy_cookie_domain job-tracker.fr $host`.
   const setCookies = response.headers.getSetCookie?.() ?? [];
   if (setCookies.length) {
