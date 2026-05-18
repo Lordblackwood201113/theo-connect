@@ -1,55 +1,62 @@
-# Déploiement — collect.locagri-app.com (Cloudflare Pages)
+# Déploiement — collect.locagri-app.com (Cloudflare Workers + Static Assets)
 
-Le frontend statique est servi par **Cloudflare Pages**. Les requêtes API vers le backend ODK Central (`https://job-tracker.fr`) sont relayées en same-origin par une Pages Function (`functions/_middleware.js`) — équivalent du reverse-proxy nginx utilisé sous Coolify.
+Frontend Vue statique servi par **Cloudflare Workers** avec le binding **Static Assets**. Un worker (`worker.js`) relaie en same-origin les requêtes API vers le backend ODK Central (`https://job-tracker.fr`) et délègue tout le reste au bundle statique (`dist/`) — équivalent du reverse-proxy nginx utilisé sous Coolify.
 
-## 1. Connecter le repo à Cloudflare Pages
+## 1. Projet Cloudflare (Workers)
 
-1. Dashboard Cloudflare → **Workers & Pages** → **Create** → **Pages** → **Connect to Git**.
-2. Sélectionner `Lordblackwood201113/theo-connect`, branche **`master`**.
-3. **Build settings** :
-   - Framework preset : **None** (ou *Vite*)
-   - Build command : `npm run build`
-   - Build output directory : `dist`
-   - Root directory : `/`
-   - Node version : `22` (variable `NODE_VERSION=22` dans **Environment variables**)
-4. Lancer le premier déploiement. Récupérer l'URL `<project>.pages.dev` une fois le build OK.
+Dashboard Cloudflare → **Workers & Pages** → **Create** → **Workers** → **Connect to Git** → repo `Lordblackwood201113/theo-connect`, branche `master`.
 
-> Le fichier `wrangler.toml` à la racine fixe `pages_build_output_dir = "dist"` ; Cloudflare le détecte automatiquement et pré-remplit ces champs.
+**Build & deploy settings** :
 
-## 2. Vérifier le proxy
+| Champ | Valeur |
+|---|---|
+| Build command | `npm run build` |
+| Deploy command | `npx wrangler deploy` *(défaut)* |
+| Root directory | `/` |
+| Node version | gérée par `.nvmrc` (`22`) |
 
-Une fois le premier déploiement vert, tester sur l'URL `<project>.pages.dev` :
+Le `wrangler.toml` à la racine déclare le worker (`main = "worker.js"`) et le binding statique (`[assets] directory = "./dist"`). Vérifier que le **nom du projet Cloudflare** correspond au champ `name` du `wrangler.toml` (`theo-collect`) — sinon aligner l'un sur l'autre.
+
+## 2. Vérifier le déploiement
+
+Une fois le build vert, Cloudflare expose `https://theo-collect.<account>.workers.dev`.
 
 ```bash
-curl -i https://<project>.pages.dev/version.txt          # → 200, contenu ODK Central
-curl -i https://<project>.pages.dev/client-config.json   # → 200, JSON
-curl -i https://<project>.pages.dev/v1/projects          # → 401 (auth requise, c'est attendu)
+curl -i https://theo-collect.<account>.workers.dev/version.txt          # 200, version ODK
+curl -i https://theo-collect.<account>.workers.dev/client-config.json   # 200, JSON
+curl -i https://theo-collect.<account>.workers.dev/v1/projects          # 401 (auth requise)
+curl -I https://theo-collect.<account>.workers.dev/                     # 200, SPA
 ```
 
-Si l'un de ces appels renvoie un 404 / la page SPA, c'est que la function n'est pas active — vérifier que `functions/_middleware.js` est bien présent à la racine du build et que les Pages Functions sont activées (par défaut elles le sont).
+Si `/version.txt` renvoie le HTML de la SPA → le worker ne route pas le proxy correctement, vérifier les logs Cloudflare (**Workers → theo-collect → Logs**).
 
 ## 3. Domaine custom `collect.locagri-app.com`
 
-Dans la zone Cloudflare de `locagri-app.com` :
+Zone DNS de `locagri-app.com` chez **Hostinger** (pas sur Cloudflare DNS).
 
-1. Dans le projet Pages → **Custom domains** → **Set up a custom domain** → saisir `collect.locagri-app.com`.
-2. Cloudflare propose l'enregistrement DNS à créer : un **CNAME** `collect` → `<project>.pages.dev`, proxifié (nuage orange).
-   - Si la zone est déjà sur Cloudflare, accepter l'auto-création.
-   - Sinon : ajouter manuellement le CNAME dans le DNS du registrar.
-3. Attendre l'émission du certificat (quelques minutes, géré par Cloudflare).
+1. Projet Worker → **Settings → Domains & Routes → Add → Custom Domain** → `collect.locagri-app.com`.
+2. Cloudflare affiche le CNAME à créer côté Hostinger :
+   ```
+   Type : CNAME
+   Nom  : collect
+   Cible: theo-collect.<account>.workers.dev
+   ```
+3. Créer ce CNAME dans **hPanel Hostinger → Domaines → locagri-app.com → DNS / Nameservers**.
+4. Attendre la propagation (1-15 min) puis l'émission du certificat TLS par Cloudflare.
 
-## 4. Tester le domaine final
+## 4. Vérification finale
 
 ```bash
-curl -I https://collect.locagri-app.com/                  # → 200, SPA
-curl -i https://collect.locagri-app.com/version.txt       # → 200, ODK Central
-curl -i https://collect.locagri-app.com/v1/projects       # → 401
+curl -I https://collect.locagri-app.com/
+curl -i https://collect.locagri-app.com/version.txt
+curl -i https://collect.locagri-app.com/v1/projects
 ```
 
-Puis se connecter dans un navigateur, vérifier que la session reste authentifiée (les cookies sont bien posés sur `collect.locagri-app.com` grâce à la réécriture du `Domain=` dans le middleware).
+Puis ouvrir le navigateur, se connecter, et vérifier que la session tient sur refresh (`document.cookie` ne doit pas contenir d'attribut `Domain=`).
 
 ## Fichiers concernés
 
-- `functions/_middleware.js` — reverse-proxy `/v1`, `/-`, `/enketo-passthrough`, `/client-config.json`, `/version.txt` vers `https://job-tracker.fr`, avec réécriture des cookies pour rester same-origin.
-- `wrangler.toml` — déclare le dossier de build (`dist`) pour Cloudflare Pages.
-- `nginx.conf` / `Dockerfile` — config historique pour Coolify ; ignorée par Cloudflare Pages mais conservée pour le dev local et un éventuel fallback.
+- `worker.js` — Worker entrypoint. Proxy `/v1`, `/-`, `/enketo-passthrough`, `/client-config.json`, `/version.txt` vers `https://job-tracker.fr` (réécriture `Set-Cookie` pour rester same-origin). Tout le reste → `env.ASSETS.fetch(request)`.
+- `wrangler.toml` — déclare `main`, `compatibility_date`, et le binding `[assets]` avec `not_found_handling = "single-page-application"` pour le routage SPA.
+- `.nvmrc` — pin Node 22 pour le build CF.
+- `nginx.conf` / `Dockerfile` — config Coolify historique, non utilisée par Cloudflare. Conservée pour dev local et éventuel fallback.

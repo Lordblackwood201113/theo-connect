@@ -1,3 +1,8 @@
 name = "theo-collect"
 compatibility_date = "2025-05-01"
-pages_build_output_dir = "dist"
+main = "worker.js"
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
