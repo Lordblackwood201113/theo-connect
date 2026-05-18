@@ -1,4 +1,4 @@
-# Déploiement — collect.locagri-app.com (Cloudflare Pages)
+# Déploiement — theo-collect.locagri-app.com (Cloudflare Pages)
 
 Le frontend statique est servi par **Cloudflare Pages**. Les requêtes API vers le backend ODK Central (`https://job-tracker.fr`) sont relayées en same-origin par une Pages Function (`functions/_middleware.js`) — équivalent du reverse-proxy nginx utilisé sous Coolify.
 
@@ -27,9 +27,9 @@ curl -i  $BASE/v1/projects          # 401 (auth requise)
 curl -I  $BASE/projects/123         # 200, SPA fallback
 ```
 
-## 3. Custom domain `collect.locagri-app.com` (DNS sur Hostinger)
+## 3. Custom domain `theo-collect.locagri-app.com` (DNS sur Hostinger)
 
-1. Projet Pages → **Custom domains** → **Set up a custom domain** → saisir `collect.locagri-app.com`.
+1. Projet Pages → **Custom domains** → **Set up a custom domain** → saisir `theo-collect.locagri-app.com`.
 2. Cloudflare affiche le CNAME à créer côté Hostinger :
    ```
    Type  : CNAME
@@ -42,9 +42,9 @@ curl -I  $BASE/projects/123         # 200, SPA fallback
 4. Cloudflare détecte la propagation puis émet le certificat TLS (1-15 min).
 5. Vérifier :
    ```bash
-   dig +short collect.locagri-app.com
-   curl -I  https://collect.locagri-app.com/
-   curl -i  https://collect.locagri-app.com/version.txt
+   dig +short theo-collect.locagri-app.com
+   curl -I  https://theo-collect.locagri-app.com/
+   curl -i  https://theo-collect.locagri-app.com/version.txt
    ```
 
 ## Fichiers concernés
