@@ -1,4 +1,4 @@
-name = "theo-collect"
+name = "theo-connect"
 compatibility_date = "2025-05-01"
 main = "worker.js"
 
